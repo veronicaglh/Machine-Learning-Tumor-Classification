@@ -81,8 +81,8 @@ label_6 = Label(window1, text='are not cancerous and do not spread towards the r
 label_7 = Label(window1, text='Our product will use machine learning to classify a tumor either as', bg='#00347A',fg='white',font=('Calibri', 12, 'normal'))
 label_8 = Label(window1, text='benign or malignant. The user will give the input data in the entry', bg='#00347A',fg='white',font=('Calibri', 12, 'normal'))
 label_9 = Label(window1, text='below. The program will then classify the tumor. The input data', bg='#00347A',fg='white',font=('Calibri', 12, 'normal'))
-label_10 = Label(window1, text='can be taken from the kaggle data set or the user can', bg='#00347A',fg='white',font=('Calibri', 12, 'normal'))
-label_11 = Label(window1, text='use the sample input data given below', bg='#00347A',fg='white',font=('Calibri', 12, 'normal'))
+label_10 = Label(window1, text='can be taken from the kaggle data set', bg='#00347A',fg='white',font=('Calibri', 12, 'normal'))
+
 
 get_input = Label(window1, text='Input data:',bg='#00347A',fg='white', font=('Calibri', 12, 'normal'))
 get_input_entry = Entry(window1, highlightthickness=2, width=50)
@@ -104,7 +104,6 @@ label_7.place(x=650, y=300)
 label_8.place(x=650, y=320)
 label_9.place(x=650, y=340)
 label_10.place(x=650, y=360)
-label_10.place(x=650, y=362)
 
 get_input.place(x=650, y=395)
 get_input_entry.place(x=730, y=395)
@@ -172,3 +171,135 @@ get_input_8.place(x=740, y=390)
 get_input_9.place(x=740, y=410)
 # ~~~~~~~~~~~~~~~~ end of window3 ~~~~~~~~~~~~~~~~
 
+
+
+####################################################################### PART 2 ############################################################################################
+# Part Two - Computational Implementation 
+def calculatePrediction(): 
+    # 2.1) Data Collection & Processing
+    # loading the data from sklearn
+    breast_cancer_dataset = sklearn.datasets.load_breast_cancer()
+
+    # To view the dataset we can use the command below 
+    # print(breast_cancer_dataset)
+
+    # loading the data to a data frame
+    # The data_frame helps us organize the dataset into a tabular format - making it more readable 
+    # The contents of the data_frame are the features(as the column) and the coressponding data(as the rows)
+    data_frame = pd.DataFrame(breast_cancer_dataset.data, columns = breast_cancer_dataset.feature_names)
+
+    # To view the first 5 rows of the dataframe we can use the command below 
+    # data_frame.head()
+
+    # adding the 'target' column to the data frame which will contain either 0(Malignant) or 1(Benign)
+    data_frame['label'] = breast_cancer_dataset.target
+
+    # To print the last 5 rows of the dataframe we can use this commad 
+    # data_frame.tail()
+
+    # To view the number of rows and columns in the dataset
+    # data_frame.shape    #(569, 31)
+
+    # To get more information about the data
+    # such as the datatype each feature contains and wether or not null values are permissible 
+    data_frame.info()
+
+    # To check the number of null values that have been entered for the features can also checkfor missing values
+    data_frame.isnull().sum()
+
+    # To get statistical measures about the data. For example: the mean value of the features, as well as the minimum and maximum value
+    data_frame.describe()
+
+    # To check the distribution of target varibales - how many are benign(non-cancerous) and how many are malignant(cancerous)
+    data_frame['label'].value_counts()
+
+    data_frame.groupby('label').mean()
+
+    #####################################################
+    # 2.2) Separating the features from the target 
+    # X - represents the features only since the label/target value has been dropped. 
+    # Y - represents the label or the traget without the features. 
+    X = data_frame.drop(columns='label', axis=1)
+    Y = data_frame['label']
+
+    # To view the value od X and Y 
+    # print(X)
+    # print(Y)
+
+    #####################################################
+    # 2.3) Splitting the data into training data & Testing data
+    # 20% of the data will be testing data while 80% will be training data 
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+    # print(X.shape, X_train.shape, X_test.shape)
+
+    #####################################################
+    # 2.4) Model Training
+    # Logistic Regression 
+    # getting an instance from logistic regression and storing it in identifier named model 
+    # train the model usinf fit()
+    model = LogisticRegression()
+    model.fit(X_train, Y_train)
+
+    #####################################################
+    # 2.5) Model Evaluation
+    # Accuracy Score 
+
+    # To check the accuracy on training data we have used accuracy_score()
+    # which compares the models prediction(X_train_prediction) with the actual value/prediction(Y_train)
+    # The accuracy of the model on the training data is 0.945 which can be approximated to 95% accurate 
+    X_train_prediction = model.predict(X_train)
+    training_data_accuracy = accuracy_score(Y_train, X_train_prediction) 
+
+    # print('Accuracy on training data = ', training_data_accuracy)
+
+    # To check accuracy on test data 
+    # The accuracy of the model on the testing data is 0.935 which can be approximated to 94% accurate 
+    X_test_prediction = model.predict(X_test)
+    test_data_accuracy = accuracy_score(Y_test, X_test_prediction) 
+
+    # print('Accuracy on test data = ', test_data_accuracy)
+
+    #######################
+    # 2.5) Finalization 
+    # recieving the data from the user 
+    # However the data is orginally recieved as string but it must be convereted to numpy array
+    # To do so the string value(input_data_as_string) must be convereted to tuple. 
+    # It is convereted then stored in the variable named as res 
+    # The tuple(res) is then converted to numpy array by using the np.asarray() function
+
+    input_data_as_string= get_input_entry.get()
+    res = tuple(map(float, input_data_as_string.split(',')))
+    print(res)
+    input_data_as_numpy_array = np.asarray(res)
+
+
+    input_data_reshaped = input_data_as_numpy_array.reshape(1,-1)
+    prediction = model.predict(input_data_reshaped)
+    if (prediction[0] == 0):
+        result_message_4 = "The Breast cancer is Malignant"
+        result_text_box.insert('end', result_message_4)
+      
+
+    else:
+        result_message_5 = "The Breast cancer is Benign"
+        result_text_box.insert('end', result_message_5)
+
+
+# TKINTER BUTTONS
+# The reason the button has been implemented here is because it calls the function calculatePrediction()
+# However we need to write these functions before implementing the buttons otherwise the program will not know them.
+generate_result_button = Button(window2, text='Get Result',fg='#535353',font=('Calibri', 12, 'normal'), command=calculatePrediction)
+generate_result_button.config(width=9)
+generate_result_button.place(x=900, y=340)
+mainWindow.mainloop()
+
+# Note: After running the program the user can take sample input data from the dataset which can be found in the dataset folder.
+# When taking sample input data only the 30 features are considered so no need to put the target(diagnosis) or the id 
+# The input data has 30 entries since there are 30 features each of the entries must be separted with a comma
+# Or user can copy and paste the following sample input data: 
+# 13.54,14.36,87.46,566.3,0.09779,0.08129,0.06664,0.04781,0.1885,0.05766,0.2699,0.7886,2.058,23.56,0.008462,0.0146,0.02387,0.01315,0.0198,0.0023,15.11,19.26,99.7,711.2,0.144,0.1773,0.239,0.1288,0.2977,0.07259
+# 17.99,10.38,122.8,1001,0.1184,0.2776,0.3001,0.1471,0.2419,0.07871,1.095,0.9053,8.589,153.4,0.006399,0.04904,0.05373,0.01587,0.03003,0.006193,25.38,17.33,184.6,2019,0.1622,0.6656,0.7119,0.2654,0.4601,0.1189
+# 20.57,17.77,132.9,1326,0.08474,0.07864,0.0869,0.07017,0.1812,0.05667,0.5435,0.7339,3.398,74.08,0.005225,0.01308,0.0186,0.0134,0.01389,0.003532,24.99,23.41,158.8,1956,0.1238,0.1866,0.2416,0.186,0.275,0.08902
+# 19.69,21.25,130,1203,0.1096,0.1599,0.1974,0.1279,0.2069,0.05999,0.7456,0.7869,4.585,94.03,0.00615,0.04006,0.03832,0.02058,0.0225,0.004571,23.57,25.53,152.5,1709,0.1444,0.4245,0.4504,0.243,0.3613,0.08758
+# 11.42,20.38,77.58,386.1,0.1425,0.2839,0.2414,0.1052,0.2597,0.09744,0.4956,1.156,3.445,27.23,0.00911,0.07458,0.05661,0.01867,0.05963,0.009208,14.91,26.5,98.87,567.7,0.2098,0.8663,0.6869,0.2575,0.6638,0.173
