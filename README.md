@@ -1,0 +1,2 @@
+###### This project will use machine learning to classify a tumor as benign (non-cancerous) or malignant (cancerous). The dataset used for this program can be accessed here: https://www.kaggle.com/datasets/uciml/breast-cancer-wisconsin-data. The input data can be taken from the dataset. Please run the main.py file as a python program to view the result. 
+###### Don't want to clone this repo? You can view the output here:  https://drive.google.com/file/d/1hDp7bgw-f-sFRvkmrMKc1WASF-hPi4jW/view?usp=sharing
